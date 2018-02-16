@@ -57,3 +57,6 @@ typings/
 # dotenv environment variables file
 .env
 
+# Pesky macOS file that plauges git repos
+.DS_Store
+
