@@ -89,21 +89,22 @@ app.get('/scrape', (req, res) => {
 
             if (result.title && result.link && result.content) {
                 db.Article.create({
-                    title: result.title,
-                    date_posted: result.date_posted,
-                    link: result.link,
-                    content: result.content
-                }), (err, inserted) => {
-                    if (err) {
-                        console.log(err)
-                    } else {
-                        console.log(inserted)
-
+                        title: result.title,
+                        date_posted: result.date_posted,
+                        link: result.link,
+                        content: result.content
+                    }).then(function() {
+                        res.redirect('/')
+                    }),
+                    function(err, inserted) {
+                        if (err) {
+                            console.log(err)
+                        } else {
+                            console.log(inserted)
+                        }
                     }
-                }
             }
         })
-        res.redirect('/')
     });
 });
 

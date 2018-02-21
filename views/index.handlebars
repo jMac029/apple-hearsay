@@ -18,24 +18,17 @@
                 </div>
                 <div class="panel-body">
                     <p>{{{this.content}}}</p>
+                    <a role="button" class="btn btn-success" href="{{this.link}}" target='_blank'>Read on MacRumors</a>
                 </div>
+                    
                 <div class="panel-footer">
                     <div>
                         <p>Comments</p>
-                        {{#each this.comments}}
-                            {{!-- {{this.comment._id}}
-                            {{this.comment.name}} --}}
-                            {{this.comments.comment_text}}
-                        {{/each}}
+                        {{comments.comment_text}}
                     </div>
                     <hr>
                     <form id="comment-form" action="/articles/{{this._id}}" method="POST">
-                        {{!-- <div class="form-group">
-                            <label for="name">Name</label>
-                            <input type="text" class="form-control" name="name" id="name" placeholder="john doe">
-                        </div> --}}
                         <div class="form-group">
-                            {{!-- <label for="comment_text">Comment</label> --}}
                             <input type="text" class="form-control" name="comment_text" id="comment" placeholder="leave a comment">
                         </div>
                         <button type="submit" class="btn btn-primary" id="comment-submit-button">Submit</button>

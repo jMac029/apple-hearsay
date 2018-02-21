@@ -1,21 +1,15 @@
 // when the Fetch button is clicked
 $(document).on("click", "#scrape-news-button", function() {
-    console.log("clickity click click")
-        // Make an AJAX GET request to delete the notes from the db
+    // Make an AJAX GET request to scrape for new articles
     $.ajax({
         type: "GET",
         url: "/scrape",
-        // On a successful call, clear the #results section
-        success: function(response) {
-            $.ajax({
-                type: "GET",
-                url: "/"
-            })
-        }
-    });
+    }).then(function() {
+        location.reload()
+    })
 });
 
-// // When you click the savenote button
+// // When you click the submit button for a comment
 // $(document).on("submit", "#comment-form", function() {
 //     // Grab the id associated with the article from the submit button
 //     var thisId = $(this).attr("data-id");
