@@ -40,7 +40,7 @@ mongoose.Promise = Promise;
 mongoose.connect(MONGODB_URI, {})
 
 app.get("/", (req, res) => {
-    db.Article.find({})
+    db.Article.find().sort({ _id: 1 }).populate('comments')
         .then(function(dbArticle) {
             // If all Notes are successfully found, send them back to the client
             //res.json(dbArticle);
@@ -68,6 +68,9 @@ app.get('/scrape', (req, res) => {
             result.title = $(this)
                 .children('.title')
                 .text()
+            result.date_posted = $(this)
+                .children('.byline')
+                .text()
             result.link = $(this)
                 .children('.title')
                 .children('a')
@@ -86,6 +89,7 @@ app.get('/scrape', (req, res) => {
             if (result.title && result.link && result.content) {
                 db.Article.create({
                     title: result.title,
+                    date_posted: result.date_posted,
                     link: result.link,
                     content: result.content
                 }), (err, inserted) => {
@@ -99,15 +103,15 @@ app.get('/scrape', (req, res) => {
         });
 
         // If we were able to successfully scrape and save an Article, send a message to the client
-        // res.send('Scrape Complete');
-        res.redirect('/')
+        console.log('Scrape Complete');
+        res.render('/')
     });
 });
 
 // Route for getting all Articles from the db
 app.get('/articles', (req, res) => {
     // TODO: Finish the route so it grabs all of the articles
-    db.Article.find({})
+    db.Article.find({}).populate('comments')
         .then(function(dbArticle) {
             // If all Notes are successfully found, send them back to the client
             res.json(dbArticle);
@@ -134,7 +138,7 @@ app.get('/articles/:id', (req, res) => {
             } else {
                 res.json(data)
             }
-        }).populate('note')
+        }).populate('comments')
         .then(function(dbArticle) {
             // If any Libraries are found, send them to the client with any associated Books
             res.json(dbArticle);
@@ -149,19 +153,22 @@ app.get('/articles/:id', (req, res) => {
 app.post('/articles/:id', (req, res) => {
     // TODO
     // ====
-    // save the new note that gets posted to the Notes collection
+    // save the new comment that gets posted to the Comments collection
     // then find an article from the req.params.id
-    // and update it's 'note' property with the _id of the new note
-    db.Note.create(req.body)
-        .then(function(dbNote) {
-            // If a Note was created successfully, find one User (there's only one) and push the new Note's _id to the User's `notes` array
+    // and update it's 'comments' property with the _id of the new comment
+    db.Comments.create(req.body)
+        .then(function(dbComment) {
+            // If a Comment was created successfully, find one User (there's only one) and push the new Note's _id to the User's `notes` array
             // { new: true } tells the query that we want it to return the updated User -- it returns the original by default
             // Since our mongoose query returns a promise, we can chain another `.then` which receives the result of the query
-            return db.Article.findOneAndUpdate({ _id: req.params.id }, { $push: { note: dbNote._id } }, { new: true });
+            return db.Article.findOneAndUpdate({ _id: req.params.id }, {
+                $push: { name: dbComment._id, body: dbComment._id }
+            }, { new: true });
         })
         .then(function(dbArticle) {
             // If the User was updated successfully, send it back to the client
-            res.json(dbArticle);
+            // res.json(dbArticle);
+            res.redirect('/')
         })
         .catch(function(err) {
             // If an error occurs, send it back to the client

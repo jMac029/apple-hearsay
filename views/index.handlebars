@@ -14,23 +14,29 @@
             <div class="panel panel-success">
                 <div class="panel-heading">
                     <h3 class="panel-title">{{this.title}}</h3>
+                    <p>{{this.date_posted}}</p>
                 </div>
                 <div class="panel-body">
                     <p>{{{this.content}}}</p>
                 </div>
                 <div class="panel-footer">
                     <div>
-                        {{this.comment.name}}
-                        {{this.comment.body}}
+                        <p>Comments</p>
+                        {{#each this.comments}}
+                            {{comment.id}}
+                            {{comment.name}}
+                            {{comment.body}}
+                        {{/each}}
                     </div>
-                    <form id="comment-form">
+                    <hr>
+                    <form id="comment-form" action="/articles/{{this._id}}" method="post">
                         <div class="form-group">
                             <label for="name">Name</label>
-                            <input type="text" class="form-control" id="name" placeholder="john doe">
+                            <input type="text" class="form-control" name="name" placeholder="john doe">
                         </div>
                         <div class="form-group">
-                            <label for="comment">Comment</label>
-                            <input type="text" class="form-control" id="comment" placeholder="leave a comment">
+                            <label for="body">Comment</label>
+                            <input type="text" class="form-control" name="body" placeholder="leave a comment">
                         </div>
                         <button type="submit" class="btn btn-primary" id="comment-submit-button">Submit</button>
                     </form>
