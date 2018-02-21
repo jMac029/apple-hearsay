@@ -25,4 +25,6 @@
 img {
     width: 25%;
     height: 25%;
+    float: inherit;
+    padding: 20px;
 }

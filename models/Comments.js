@@ -9,11 +9,16 @@ let CommentSchema = new Schema({
     // `title` is of type String
     name: String,
     // `body` is of type String
-    body: String
+    comment_text: String,
+    // date_added for keeping comments in order by date posted
+    date_added: {
+        type: Date,
+        default: Date.now
+    }
 });
 
 // This creates our model from the above schema, using mongoose's model method
-let Comment = mongoose.model("Comment", CommentSchema);
+let Comments = mongoose.model("Comments", CommentSchema);
 
 // Export the Note model
-module.exports = Comment;
+module.exports = Comments;

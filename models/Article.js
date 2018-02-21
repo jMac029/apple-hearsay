@@ -26,10 +26,14 @@ let ArticleSchema = new Schema({
         type: String,
         required: true,
     },
-    // `comment` is an object that stores a Comment id
-    // The ref property links the ObjectId to the Note model
+    date_added: {
+        type: Date,
+        default: Date.now
+    },
+    // `comments` is an object that stores a Comment id
+    // The ref property links the ObjectId to the Comments model
     // This allows us to populate the Article with an associated Comments
-    comment: {
+    comments: {
         type: Schema.Types.ObjectId,
         ref: "Comments"
     }

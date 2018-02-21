@@ -40,7 +40,8 @@ mongoose.Promise = Promise;
 mongoose.connect(MONGODB_URI, {})
 
 app.get("/", (req, res) => {
-    db.Article.find().sort({ _id: 1 }).populate('comments')
+    db.Article.find().sort({ date_added: 1 })
+        .populate('comments')
         .then(function(dbArticle) {
             // If all Notes are successfully found, send them back to the client
             //res.json(dbArticle);
@@ -61,50 +62,48 @@ app.get('/scrape', (req, res) => {
 
         // grab every article class element, and do the following:
         $('.article').each(function(i, element) {
-            // Save an empty result object
-            var result = {}
+                // Save an empty result object
+                var result = {}
 
-            // Add the text and href of every link, and save them as properties of the result object
-            result.title = $(this)
-                .children('.title')
-                .text()
-            result.date_posted = $(this)
-                .children('.byline')
-                .text()
-            result.link = $(this)
-                .children('.title')
-                .children('a')
-                .attr('href')
-            result.content = $(this)
-                .children('.content')
-                .text()
+                // Add the text and href of every link, and save them as properties of the result object
+                result.title = $(this)
+                    .children('.title')
+                    .text()
+                result.date_posted = $(this)
+                    .children('.byline')
+                    .text()
+                result.link = $(this)
+                    .children('.title')
+                    .children('a')
+                    .attr('href')
+                result.content = $(this)
+                    .children('.content')
+                    .text()
 
-            // clean up the link that is given from macrumors to include the https
-            result.link = result.link.replace('//', 'https://')
+                // clean up the link that is given from macrumors to include the https
+                result.link = result.link.replace('//', 'https://')
 
-            // console.log(result.title)
-            // console.log(result.link)
-            // console.log(result.content)
+                // console.log(result.title)
+                // console.log(result.link)
+                // console.log(result.content)
 
-            if (result.title && result.link && result.content) {
-                db.Article.create({
-                    title: result.title,
-                    date_posted: result.date_posted,
-                    link: result.link,
-                    content: result.content
-                }), (err, inserted) => {
-                    if (err) {
-                        console.log(err)
-                    } else {
-                        console.log(inserted)
+                if (result.title && result.link && result.content) {
+                    db.Article.create({
+                        title: result.title,
+                        date_posted: result.date_posted,
+                        link: result.link,
+                        content: result.content
+                    }), (err, inserted) => {
+                        if (err) {
+                            console.log(err)
+                        } else {
+                            console.log(inserted)
+
+                        }
                     }
                 }
-            }
-        });
-
-        // If we were able to successfully scrape and save an Article, send a message to the client
-        console.log('Scrape Complete');
-        res.render('/')
+            })
+            // res.redirect('/')
     });
 });
 
@@ -150,24 +149,18 @@ app.get('/articles/:id', (req, res) => {
 });
 
 // Route for saving/updating an Article's associated Note
-app.post('/articles/:id', (req, res) => {
-    // TODO
-    // ====
-    // save the new comment that gets posted to the Comments collection
-    // then find an article from the req.params.id
-    // and update it's 'comments' property with the _id of the new comment
+app.post('/articles/:id', function(req, res) {
+    // Create a new comment and pass the req.body to the entry
     db.Comments.create(req.body)
-        .then(function(dbComment) {
+        .then(function(dbComments) {
             // If a Comment was created successfully, find one User (there's only one) and push the new Note's _id to the User's `notes` array
-            // { new: true } tells the query that we want it to return the updated User -- it returns the original by default
+            // { new: true } tells the query that we want it to return the updated Article -- it returns the original by default
             // Since our mongoose query returns a promise, we can chain another `.then` which receives the result of the query
-            return db.Article.findOneAndUpdate({ _id: req.params.id }, {
-                $push: { name: dbComment._id, body: dbComment._id }
-            }, { new: true });
+            return db.Article.findOneAndUpdate({ _id: req.params.id }, { name: dbComments._id, comment_text: dbComments._id }, { new: true, upsert: true });
         })
         .then(function(dbArticle) {
-            // If the User was updated successfully, send it back to the client
-            // res.json(dbArticle);
+            // If the Article was updated successfully, send it back to the client
+            //res.json(dbArticle);
             res.redirect('/')
         })
         .catch(function(err) {
