@@ -62,48 +62,48 @@ app.get('/scrape', (req, res) => {
 
         // grab every article class element, and do the following:
         $('.article').each(function(i, element) {
-                // Save an empty result object
-                var result = {}
+            // Save an empty result object
+            var result = {}
 
-                // Add the text and href of every link, and save them as properties of the result object
-                result.title = $(this)
-                    .children('.title')
-                    .text()
-                result.date_posted = $(this)
-                    .children('.byline')
-                    .text()
-                result.link = $(this)
-                    .children('.title')
-                    .children('a')
-                    .attr('href')
-                result.content = $(this)
-                    .children('.content')
-                    .text()
+            // Add the text and href of every link, and save them as properties of the result object
+            result.title = $(this)
+                .children('.title')
+                .text()
+            result.date_posted = $(this)
+                .children('.byline')
+                .text()
+            result.link = $(this)
+                .children('.title')
+                .children('a')
+                .attr('href')
+            result.content = $(this)
+                .children('.content')
+                .text()
 
-                // clean up the link that is given from macrumors to include the https
-                result.link = result.link.replace('//', 'https://')
+            // clean up the link that is given from macrumors to include the https
+            result.link = result.link.replace('//', 'https://')
 
-                // console.log(result.title)
-                // console.log(result.link)
-                // console.log(result.content)
+            // console.log(result.title)
+            // console.log(result.link)
+            // console.log(result.content)
 
-                if (result.title && result.link && result.content) {
-                    db.Article.create({
-                        title: result.title,
-                        date_posted: result.date_posted,
-                        link: result.link,
-                        content: result.content
-                    }), (err, inserted) => {
-                        if (err) {
-                            console.log(err)
-                        } else {
-                            console.log(inserted)
+            if (result.title && result.link && result.content) {
+                db.Article.create({
+                    title: result.title,
+                    date_posted: result.date_posted,
+                    link: result.link,
+                    content: result.content
+                }), (err, inserted) => {
+                    if (err) {
+                        console.log(err)
+                    } else {
+                        console.log(inserted)
 
-                        }
                     }
                 }
-            })
-            // res.redirect('/')
+            }
+        })
+        res.redirect('/')
     });
 });
 
@@ -156,7 +156,7 @@ app.post('/articles/:id', function(req, res) {
             // If a Comment was created successfully, find one User (there's only one) and push the new Note's _id to the User's `notes` array
             // { new: true } tells the query that we want it to return the updated Article -- it returns the original by default
             // Since our mongoose query returns a promise, we can chain another `.then` which receives the result of the query
-            return db.Article.findOneAndUpdate({ _id: req.params.id }, { name: dbComments._id, comment_text: dbComments._id }, { new: true, upsert: true });
+            return db.Article.findOneAndUpdate({ _id: req.params.id }, { comment_text: dbComments._id }, { new: true });
         })
         .then(function(dbArticle) {
             // If the Article was updated successfully, send it back to the client
