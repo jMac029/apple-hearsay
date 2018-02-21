@@ -99,7 +99,8 @@ app.get('/scrape', (req, res) => {
         });
 
         // If we were able to successfully scrape and save an Article, send a message to the client
-        res.send('Scrape Complete');
+        // res.send('Scrape Complete');
+        res.redirect('/')
     });
 });
 

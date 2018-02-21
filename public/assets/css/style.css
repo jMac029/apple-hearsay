@@ -18,3 +18,11 @@
     background-color: #209B35;
     color: #fff;
 }
+
+
+/* image sizing */
+
+img {
+    width: 25%;
+    height: 25%;
+}

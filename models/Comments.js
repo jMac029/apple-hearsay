@@ -7,7 +7,7 @@ const Schema = mongoose.Schema;
 // This is similar to a Sequelize model
 let CommentSchema = new Schema({
     // `title` is of type String
-    title: String,
+    name: String,
     // `body` is of type String
     body: String
 });

@@ -16,9 +16,25 @@
                     <h3 class="panel-title">{{this.title}}</h3>
                 </div>
                 <div class="panel-body">
-                    {{this.content}}
+                    <p>{{{this.content}}}</p>
                 </div>
-                <div class="panel-footer">Panel footer</div>
+                <div class="panel-footer">
+                    <div>
+                        {{this.comment.name}}
+                        {{this.comment.body}}
+                    </div>
+                    <form id="comment-form">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" class="form-control" id="name" placeholder="john doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="comment">Comment</label>
+                            <input type="text" class="form-control" id="comment" placeholder="leave a comment">
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="comment-submit-button">Submit</button>
+                    </form>
+                </div>
             </div>
         {{/each}}
     </div>
