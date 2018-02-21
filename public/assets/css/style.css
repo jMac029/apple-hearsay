@@ -1,0 +1,20 @@
+/* Jumbotron */
+
+.jumbotron {
+    text-align: center;
+}
+
+
+/* Logo Header */
+
+#apple-header {
+    width: 15%;
+}
+
+
+/* Scrape News Button */
+
+#scrape-news-button {
+    background-color: #209B35;
+    color: #fff;
+}

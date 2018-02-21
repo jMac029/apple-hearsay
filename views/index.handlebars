@@ -1,0 +1,25 @@
+<div class="container">
+    <div class="jumbotron">
+        <h1 class="text-center">Apple Hearsay</h1>
+        <img id="apple-header" class="img-responsive center-block" alt="red apple" src="/assets/img/red-apple.png"/>
+        <h4 class="text-center">Do you Love Rumors and Gossip about Apple Inc.?</h4>
+        <h5 class="text-center">Use this handy dandy tool to read up and leave comments on all the latest Apple Hearsay from around the web!</h5>
+        <button class="btn btn-lg" id="scrape-news-button">Fetch the Latest Hearsay</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="wrapper">
+        {{#each dbArticle}}
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{this.title}}</h3>
+                </div>
+                <div class="panel-body">
+                    {{this.content}}
+                </div>
+                <div class="panel-footer">Panel footer</div>
+            </div>
+        {{/each}}
+    </div>
+</div>
