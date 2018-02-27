@@ -9,11 +9,15 @@ var CommentSchema = new Schema({
     // `title` is of type String
     // name: String,
     // `body` is of type String
-    comment_text: String,
+    body: String,
     // date_added for keeping comments in order by date posted
     date_added: {
         type: Date,
         default: Date.now
+    },
+    article: {
+        type: Schema.Types.ObjectId,
+        ref: 'Article'
     }
 });
 

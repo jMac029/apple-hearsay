@@ -28,3 +28,13 @@ img {
     float: inherit;
     padding: 20px;
 }
+
+/* article card styling */
+.article-card {
+    margin-top: 20px;
+}
+
+.article-header {
+    background: #DFF0D8;
+    color: #3C765E;
+}

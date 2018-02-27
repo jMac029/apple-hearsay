@@ -4,37 +4,42 @@
         <img id="apple-header" class="img-responsive center-block" alt="red apple" src="/assets/img/red-apple.png"/>
         <h4 class="text-center">Do you Love Rumors and Gossip about Apple Inc.?</h4>
         <h5 class="text-center">Use this handy dandy tool to read up and leave comments on all the latest Apple Hearsay from around the web!</h5>
-        <button class="btn btn-lg" id="scrape-news-button">Fetch the Latest Hearsay</button>
+        <button type="button" class="btn btn-lg" id="scrape-news-button">Fetch the Latest Hearsay</button>
     </div>
 </div>
 
 <div class="container">
     <div class="wrapper">
         {{#each dbArticle}}
-            <div class="panel panel-success" data-id="{{this._id}}">
-                <div class="panel-heading">
-                    <h3 class="panel-title">{{this.title}}</h3>
+            <div class="card card-success article-card">
+                <div class="card-header article-header">
+                    <h3 class="card-title">{{this.title}}</h3>
                     <p>{{this.date_posted}}</p>
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                     <p>{{{this.content}}}</p>
                     <a role="button" class="btn btn-success" href="{{this.link}}" target='_blank'>Read on MacRumors</a>
                 </div>
                     
-                <div class="panel-footer">
+                <div class="card-footer">
                     <div>
                         <p>Comments</p>
-                        {{comments.comment_text}}
+                        {{#each this.comments}}
+                            <p>{{this.article}}</p>
+                            <p>{{this.body}}</p>
+                        {{/each}}
                     </div>
                     <hr>
-                    <form id="comment-form" action="/articles/{{this._id}}" method="POST">
+                    <button type="button" class="btn btn-primary addComment" data-toggle="modal" data-target="#commentModal-{{this._id}}" data-id={{this._id}}>Add a Comment</button>
+                    {{!-- <form id="comment-form">
                         <div class="form-group">
                             <input type="text" class="form-control" name="comment_text" id="comment" placeholder="leave a comment">
                         </div>
-                        <button type="submit" class="btn btn-primary" id="comment-submit-button">Submit</button>
-                    </form>
+                        <button type="button" class="btn btn-primary" id="comment-submit-button" data-id={{this._id}}>Submit</button>
+                    </form> --}}
                 </div>
             </div>
+            {{> commentsModals }}
         {{/each}}
     </div>
 </div>

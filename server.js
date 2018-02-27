@@ -40,7 +40,7 @@ mongoose.Promise = Promise;
 mongoose.connect(MONGODB_URI, {})
 
 app.get("/", (req, res) => {
-    db.Article.find().sort({ date_added: 1 })
+    db.Article.find().sort({ _id: -1 })
         .populate('comments')
         .then(function(dbArticle) {
             // If all Notes are successfully found, send them back to the client
@@ -93,8 +93,6 @@ app.get('/scrape', (req, res) => {
                         date_posted: result.date_posted,
                         link: result.link,
                         content: result.content
-                    }).then(function() {
-                        res.redirect('/')
                     }),
                     function(err, inserted) {
                         if (err) {
@@ -105,6 +103,10 @@ app.get('/scrape', (req, res) => {
                     }
             }
         })
+        res.send('Scrape Complete.');
+        function redirect() {
+            window.location = '/';
+        }
     });
 });
 
@@ -151,23 +153,49 @@ app.get('/articles/:id', (req, res) => {
 
 // Route for saving/updating an Article's associated Note
 app.post('/articles/:id', function(req, res) {
+    var comment_text = req.body
+    console.log(comment_text)
+    var newComment = new db.Comments({
+        body: req.body.text,
+        article: req.params.id,
+    });
+    console.log(newComment)
+    newComment.save(function(error, comment) {
+        if (error) {
+            console.log(error)
+        } else {
+            db.Article.findByIdAndUpdate(
+                {_id: req.params.id}, 
+                { $push: 
+                    {comments: newComment
+                }
+            }).exec(function(err){
+                if (err) {
+                console.log(err)
+                res.send(err)
+                } else {
+                    res.send(newComment)
+                }
+            })
+        }
+    })
     // Create a new comment and pass the req.body to the entry
-    db.Comments.create(req.body)
-        .then(function(dbComments) {
-            // If a Comment was created successfully, find one User (there's only one) and push the new Note's _id to the User's `notes` array
-            // { new: true } tells the query that we want it to return the updated Article -- it returns the original by default
-            // Since our mongoose query returns a promise, we can chain another `.then` which receives the result of the query
-            return db.Article.findOneAndUpdate({ _id: req.params.id }, { comment_text: dbComments._id }, { new: true });
-        })
-        .then(function(dbArticle) {
-            // If the Article was updated successfully, send it back to the client
-            //res.json(dbArticle);
-            res.redirect('/')
-        })
-        .catch(function(err) {
-            // If an error occurs, send it back to the client
-            res.json(err);
-        });
+    // newComment.save(req.body)
+    //     .then(function(dbComments) {
+    //         // If a Comment was created successfully, find one User (there's only one) and push the new Note's _id to the User's `notes` array
+    //         // { new: true } tells the query that we want it to return the updated Article -- it returns the original by default
+    //         // Since our mongoose query returns a promise, we can chain another `.then` which receives the result of the query
+    //         db.Article.findOneAndUpdate({ _id: req.params.id }, { $push: { comment_text: dbComments._id, article: req.params.id}}, { new: true });
+    //     })
+    //     .then(function(dbArticle) {
+    //         // If the Article was updated successfully, send it back to the client
+    //         //res.json(dbArticle);
+    //         res.redirect('/')
+    //     })
+    //     .catch(function(err) {
+    //         // If an error occurs, send it back to the client
+    //         res.json(err);
+    //     });
 });
 
 
