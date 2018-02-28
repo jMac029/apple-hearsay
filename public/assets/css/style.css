@@ -38,3 +38,14 @@ img {
     background: #DFF0D8;
     color: #3C765E;
 }
+
+/* Delete Comment Button */
+.deleteComment {
+    float: right;
+}
+
+/* Footer */
+.footer {
+    padding: 20px;
+    text-align: center;
+}

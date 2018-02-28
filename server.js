@@ -8,6 +8,8 @@ const cheerio = require('cheerio')
 
 // Require all models
 const db = require('./models')
+const Comments = require('./models/Comments.js');
+const Article = require('./models/Article.js');
 
 const PORT = 8080;
 
@@ -40,7 +42,7 @@ mongoose.Promise = Promise;
 mongoose.connect(MONGODB_URI, {})
 
 app.get("/", (req, res) => {
-    db.Article.find().sort({ _id: -1 })
+    Article.find().sort({ _id: -1 })
         .populate('comments')
         .then(function(dbArticle) {
             // If all Notes are successfully found, send them back to the client
@@ -88,7 +90,7 @@ app.get('/scrape', (req, res) => {
             // console.log(result.content)
 
             if (result.title && result.link && result.content) {
-                db.Article.create({
+                Article.create({
                         title: result.title,
                         date_posted: result.date_posted,
                         link: result.link,
@@ -113,7 +115,7 @@ app.get('/scrape', (req, res) => {
 // Route for getting all Articles from the db
 app.get('/articles', (req, res) => {
     // TODO: Finish the route so it grabs all of the articles
-    db.Article.find({}).populate('comments')
+    Article.find({}).populate('comments')
         .then(function(dbArticle) {
             // If all Notes are successfully found, send them back to the client
             res.json(dbArticle);
@@ -131,7 +133,7 @@ app.get('/articles/:id', (req, res) => {
     // Finish the route so it finds one article using the req.params.id,
     // and run the populate method with 'note',
     // then responds with the article with the note included
-    db.Article.findOne({
+    Article.findOne({
             _id: req.params.id
         }, (error, data) => {
             if (error) {
@@ -155,48 +157,57 @@ app.get('/articles/:id', (req, res) => {
 app.post('/articles/:id', function(req, res) {
     var comment_text = req.body
     console.log(comment_text)
-    var newComment = new db.Comments({
+    var newComment = new Comments({
         body: req.body.text,
         article: req.params.id,
     });
-    console.log(newComment)
+    console.log(req.body)
     newComment.save(function(error, comment) {
         if (error) {
             console.log(error)
         } else {
-            db.Article.findByIdAndUpdate(
+            Article.findOneAndUpdate(
                 {_id: req.params.id}, 
-                { $push: 
-                    {comments: newComment
-                }
+                { $push: {comments: comment}
             }).exec(function(err){
                 if (err) {
                 console.log(err)
                 res.send(err)
                 } else {
-                    res.send(newComment)
+                    res.send(comment)
                 }
             })
         }
     })
-    // Create a new comment and pass the req.body to the entry
-    // newComment.save(req.body)
-    //     .then(function(dbComments) {
-    //         // If a Comment was created successfully, find one User (there's only one) and push the new Note's _id to the User's `notes` array
-    //         // { new: true } tells the query that we want it to return the updated Article -- it returns the original by default
-    //         // Since our mongoose query returns a promise, we can chain another `.then` which receives the result of the query
-    //         db.Article.findOneAndUpdate({ _id: req.params.id }, { $push: { comment_text: dbComments._id, article: req.params.id}}, { new: true });
-    //     })
-    //     .then(function(dbArticle) {
-    //         // If the Article was updated successfully, send it back to the client
-    //         //res.json(dbArticle);
-    //         res.redirect('/')
-    //     })
-    //     .catch(function(err) {
-    //         // If an error occurs, send it back to the client
-    //         res.json(err);
-    //     });
 });
+
+// Delete a comment
+app.delete('/article/delete/:note_id/:article_id', function(req, res) {
+    // Use the note id to find and delete it
+    Comments.findOneAndRemove({ _id: req.params.note_id }, function(err) {
+      // Log any errors
+      if (err) {
+        console.log(err);
+        res.send(err);
+      } else {
+        Article.findOneAndUpdate(
+          { _id: req.params.article_id },
+          { $pull: { notes: req.params.note_id } }
+        )
+          // Execute the above query
+          .exec(function(err) {
+            // Log any errors
+            if (err) {
+              console.log(err);
+              res.send(err);
+            } else {
+              // Or send the note to the browser
+              res.send('Comment Deleted');
+            }
+          });
+      }
+    });
+  });
 
 
 // Start the server
